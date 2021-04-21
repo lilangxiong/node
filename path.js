@@ -1,0 +1,53 @@
+const path = require('path')
+
+// console.log(__filename)
+// console.log(path.basename(__filename))
+// console.log(path.basename(__filename, '.js'))
+// console.log(path.basename(__filename, '.css'))
+// console.log(path.basename('/a/b/c'))
+
+// console.log(path.dirname(__filename))
+// console.log(path.dirname('/a/b/c'))
+// console.log(path.dirname('/a/b/c/'))
+
+// console.log(path.extname(__filename))
+// console.log(path.extname('/a/b'))
+// console.log(path.extname('/a/b/index.html.js.css'))
+// console.log(path.extname('/a/b/index.html.js.'))
+
+// console.log(path.parse('/a/b/c/index.html'))
+// console.log(path.parse('/a/b/c/index'))
+// console.log(path.parse('/a/b/c'))
+// console.log(path.parse('/a/b/c/'))
+// console.log(path.parse('./a/b/c/'))
+
+// const obj = path.parse('./a/b/c/')
+// console.log(path.format(obj))
+
+// console.log(path.isAbsolute('a'))
+// console.log(path.isAbsolute('/a'))
+// console.log(path.isAbsolute('///a'))
+// console.log(path.isAbsolute(''))
+// console.log(path.isAbsolute('.'))
+// console.log(path.isAbsolute('../bar'))
+
+// console.log(path.join('a/b', 'c', 'index.html'))
+// console.log(path.join('/a/b', 'c', 'index.html'))
+// console.log(path.join('/a/b', 'c', '../', 'index.html'))
+// console.log(path.join('/a/b', 'c', './', 'index.html'))
+// console.log(path.join('/a/b', 'c', '/', 'index.html'))
+// console.log(path.join('/a/b', 'c', '', 'index.html'))
+// console.log(path.join(''))
+
+// console.log(path.normalize(''))
+// console.log(path.normalize('a/b/c/d'))
+// console.log(path.normalize('a///b/c../d'))
+// console.log(path.normalize('a/\\/b/c\\/d'))
+// console.log(path.normalize('a/\b/c\\/d'))
+
+console.log(path.resolve())
+console.log(path.resolve('a', 'b'))
+console.log(path.resolve('a', '/b'))
+console.log(path.resolve('/a', 'b'))
+console.log(path.resolve('/a', '/b'))
+console.log(path.resolve('index.html'))

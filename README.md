@@ -951,3 +951,88 @@ fs.unlink('a/a.txt', (err) => {
   }
 })
 ```
+
+### 同步创建目录
+
+```js
+/**
+ * 01 将来调用时需要接收类似于 a/b/c ，这样的路径，它们之间是采用 / 去行连接
+ * 02 利用 / 分割符将路径进行拆分，将每一项放入一个数组中进行管理  ['a', 'b', 'c']
+ * 03 对上述的数组进行遍历，我们需要拿到每一项，然后与前一项进行拼接 /
+ * 04 判断一个当前对拼接之后的路径是否具有可操作的权限，如果有则证明存在，否则的话就需要执行创建
+ */
+const path = require('path')
+const fs = require('fs')
+
+function makeDirSync(dirPath) {
+  let items = dirPath.split(path.sep)
+  console.log(items)
+  for (let i = 1; i <= items.length; i++) {
+    const dir = items.slice(0, i).join(path.sep)
+    console.log(dir)
+    try {
+      fs.accessSync(dir)
+    } catch (err) {
+      fs.mkdirSync(dir)
+    }
+  }
+}
+
+makeDirSync('a/b/c')
+```
+
+### 异步创建目录
+
+```js
+const path = require('path')
+const fs = require('fs')
+
+function makeDir(dirPath, cb) {
+  let parts = dirPath.split(path.sep)
+  let index = 1
+  console.log(parts)
+
+  function next() {
+    if (index > parts.length) return cb && cb()
+
+    let current = parts.slice(0, index++).join(path.sep)
+    fs.access(current, err => {
+      if (err) {
+        fs.mkdir(current, next)
+      } else {
+        next()
+      }
+    })
+  }
+
+  next()
+
+}
+
+makeDir('a/b/c', () => {
+  console.log('创建成功')
+})
+
+
+// 将 access 与 mkdir 处理成 async... 风格
+const {promisify} = require('util')
+const access = promisify(fs.access)
+const mkdir = promisify(fs.mkdir)
+
+async function myMkdir (dirPath, cb) {
+  let parts = dirPath.split(path.sep)
+  for(let index = 1; index <= parts.length; index++) {
+    let current = parts.slice(0, index).join(path.sep)
+    try {
+      await access(current)
+    } catch (err) {
+      await mkdir(current)
+    }
+  }
+  cb && cb()
+}
+
+myMkdir('a/b/c', () => {
+  console.log('创建成功')
+})
+```

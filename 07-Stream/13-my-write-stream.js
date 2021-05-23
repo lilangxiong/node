@@ -39,19 +39,19 @@ class MyWriteStream extends EventEmitter {
     this.writelen += chunk.length
 
     let flag = this.writelen < this.highWaterMark
+    let callback = () => {
+      cb && cb()
+      this._clearBuffer()
+    }
     this.needDrain = !flag
 
     if (this.writeing) {
       // 当前正在执行写入，所以内容应该排队
-      this.cache.enQueue({ chunk, encoding, cb })
+      this.cache.enQueue({ chunk, encoding, cb: callback })
     } else {
       this.writeing = true
       // 当前不是正在写入那么就执行写入
-      this._write(chunk, encoding, () => {
-        cb && cb()
-        // 清空队列的内容
-        this._clearBuffer()
-      })
+      this._write(chunk, encoding, callback)
     }
 
     return flag
@@ -62,7 +62,6 @@ class MyWriteStream extends EventEmitter {
     if (typeof this.fd !== 'number') {
       return this.once('open', () => { this._write(chunk, encoding, cb) })
     }
-
     fs.write(this.fd, chunk, this.start, chunk.length, this.write, (err, written) => {
       this.writeOffset += written
       this.writelen -= written
@@ -73,16 +72,13 @@ class MyWriteStream extends EventEmitter {
   _clearBuffer() {
     let data = this.cache.dlQueue()
     if (data) {
-      this._write(data.element.chunk, data.element.encoding, () => {
-        data.element.cb && data.element.cb()
-        this._clearBuffer()
-      })
+      this._write(data.element.chunk, data.element.encoding, data.element.cb)
     } else {
       // 需要发送drain事件
       if (this.needDrain) {
         this.needDrain = false
         this.emit('drain')
-      }
+      } 
     }
   }
 }
@@ -101,4 +97,8 @@ ws.write('1', 'utf-8', () => {
 
 ws.write('10', 'utf-8', () => {
   console.log('ok2')
+})
+
+ws.on('drain', () => {
+  console.log('drain')
 })
